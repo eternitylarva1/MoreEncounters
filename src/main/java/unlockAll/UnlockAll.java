@@ -46,13 +46,22 @@ public class UnlockAll implements EditCardsSubscriber,
     }
 
     public void receivePostInitialize() {
-
+        for(AbstractCard c : CardLibrary.getAllCards()){
+            UnlockTracker.markCardAsSeen(c.cardID);
+        }
+        for(AbstractRelic r : RelicLibrary.rareList){
+            UnlockTracker.markRelicAsSeen(r.relicId);
+        }
+        for(AbstractRelic r : RelicLibrary.commonList){
+            UnlockTracker.markRelicAsSeen(r.relicId);
+        }
+        for(AbstractRelic r : RelicLibrary.uncommonList){
+            UnlockTracker.markRelicAsSeen(r.relicId);
+        }
         unlockAscensionLevel();
         unlockFinalAct();
         unlockDaily();
         unlockBetaArtAndEnding();
-        unlockRelics();
-        unlockCards();
     }
 
     public static void unlockBetaArtAndEnding() {
@@ -96,7 +105,6 @@ public class UnlockAll implements EditCardsSubscriber,
             UnlockTracker.lockedCards.remove(id);
             AbstractCard c = CardLibrary.getCard(id);
             if (c != null && !c.isSeen) {
-                UnlockTracker.markCardAsSeen(c.cardID);
                 c.isSeen = true;
                 c.unlock();
                 UnlockTracker.seenPref.putInteger(id, 1);
@@ -106,21 +114,7 @@ public class UnlockAll implements EditCardsSubscriber,
         UnlockTracker.unlockPref.flush();
     }
 
-    public static void unlockRelics() {
-        RelicLibrary.initialize();
-        for (String id : unlockAll.RelicLibrary.RELIC_IDS) {
-            UnlockTracker.unlockPref.putInteger(id, 2);
-            UnlockTracker.lockedRelics.remove(id);
-            AbstractRelic r = RelicLibrary.getRelic(id);
-            if (r != null && !r.isSeen) {
-                UnlockTracker.markRelicAsSeen(r.relicId);
-                r.isSeen = true;
-                UnlockTracker.relicSeenPref.putInteger(id, 1);
-            }
-        }
-        UnlockTracker.unlockPref.flush();
-        UnlockTracker.relicSeenPref.flush();
-    }
+
 
     public static void unlockAscensionLevel() {
         UnlockTracker.hardUnlockOverride("The Silent");
