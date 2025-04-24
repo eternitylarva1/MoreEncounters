@@ -17,6 +17,13 @@
             <systemPath>${basedir}/lib/SlayTheSpire-android.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.badlogicgames.gdx.freetype</groupId>
+            <artifactId>freetype</artifactId>
+            <version>2.2</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/gdx-freetype-1.9.10.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.badlogicgames.gdx</groupId>
             <artifactId>gdx</artifactId>
             <version>1.9.5</version>
@@ -24,7 +31,7 @@
     </dependencies>
 
     <build>
-        <finalName>UnlockAll</finalName>
+        <finalName>DevConsole</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
