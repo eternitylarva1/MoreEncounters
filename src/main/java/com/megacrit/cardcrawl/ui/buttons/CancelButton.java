@@ -24,6 +24,7 @@ import com.megacrit.cardcrawl.rooms.RestRoom;
 import com.megacrit.cardcrawl.rooms.TreasureRoomBoss;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen.CurScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuPanelScreen.PanelScreen;
+import helpers.RestartRunHelper;
 import ui.RoomRestartButton;
 
 public class CancelButton {
@@ -45,8 +46,10 @@ public class CancelButton {
     private static final float TEXT_OFFSET_Y;
     private static final float HITBOX_W;
     private static final float HITBOX_H;
+    private static final float DRAW_Y1 = (128.0F + 100 * 1.25F) * Settings.scale;
     public Hitbox hb;
-    public   RoomRestartButton restartField = null;
+    public Hitbox restartHb ;
+
     public CancelButton() {
         this.current_x = HIDE_X;
         this.target_x = this.current_x;
@@ -56,7 +59,9 @@ public class CancelButton {
         this.buttonText = "NOT_SET";
         this.hb = new Hitbox(0.0F, 0.0F, HITBOX_W, HITBOX_H);
         this.hb.move(SHOW_X - 106.0F * Settings.scale, DRAW_Y + 60.0F * Settings.scale);
-        this.restartField = new RoomRestartButton();
+        this.restartHb = new Hitbox(0.0F, 0.0F, HITBOX_W, HITBOX_H);
+        this.restartHb.move(SHOW_X - 106.0F * Settings.scale, DRAW_Y1 + 60.0F * Settings.scale);
+
     }
 
     public void update() {
@@ -64,15 +69,26 @@ public class CancelButton {
 
                 this.updateGlow();
             this.hb.update();
+            if (CardCrawlGame.isInARun() && AbstractDungeon.screen == AbstractDungeon.CurrentScreen.SETTINGS && (AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoom || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomElite || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomBoss) && !(AbstractDungeon.getCurrRoom()).monsters.areMonstersBasicallyDead()) {
+                this.restartHb.update();
+            }
             if (InputHelper.justClickedLeft && this.hb.hovered) {
                 this.hb.clickStarted = true;
                 CardCrawlGame.sound.play("UI_CLICK_1");
             }
-
-            if (this.hb.justHovered) {
-                CardCrawlGame.sound.play("UI_HOVER");
+            if (InputHelper.justClickedLeft && this.restartHb.hovered) {
+                this.restartHb.clickStarted = true;
+                CardCrawlGame.sound.play("UI_CLICK_1");
             }
 
+            if (this.hb.justHovered||this.restartHb.justHovered) {
+                CardCrawlGame.sound.play("UI_HOVER");
+            }
+            if (this.restartHb.clicked) {
+                this.restartHb.clicked = false;
+                hide();
+                RestartRunHelper.queuedRoomRestart = true;
+            }
             if (this.hb.clicked || (InputHelper.pressedEscape || CInputActionSet.cancel.isJustPressed()) && this.current_x != HIDE_X) {
                 AbstractDungeon.screenSwap = false;
                 InputHelper.pressedEscape = false;
@@ -136,9 +152,7 @@ public class CancelButton {
                 this.current_x = this.target_x;
             }
         }
-        if (CardCrawlGame.isInARun() &&AbstractDungeon.screen == AbstractDungeon.CurrentScreen.SETTINGS &&(AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoom || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomElite || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomBoss) && !(AbstractDungeon.getCurrRoom()).monsters.areMonstersBasicallyDead()) {
-            this.restartField.update();
-        }
+
     }
 
     private void updateGlow() {
@@ -167,7 +181,7 @@ public class CancelButton {
             this.target_x = HIDE_X;
             this.isHidden = true;
         }
-        restartField.hide();
+
     }
 
     public void hideInstantly() {
@@ -178,7 +192,7 @@ public class CancelButton {
             this.current_x = this.target_x;
             this.isHidden = true;
         }
-         restartField.hideInstantly();
+
 
     }
 
@@ -195,8 +209,7 @@ public class CancelButton {
         }
 
         this.hb.hovered = false;
-        if (CardCrawlGame.isInARun() && (AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoom || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomElite || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomBoss) && !(AbstractDungeon.getCurrRoom()).monsters.areMonstersBasicallyDead())
-            restartField.show(buttonText);
+
     }
 
     public void showInstantly(String buttonText) {
@@ -205,8 +218,7 @@ public class CancelButton {
         this.isHidden = false;
         this.buttonText = buttonText;
         this.hb.hovered = false;
-        if (CardCrawlGame.isInARun() && (AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoom || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomElite || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomBoss) && !(AbstractDungeon.getCurrRoom()).monsters.areMonstersBasicallyDead())
-            restartField.showInstantly(buttonText);
+
     }
 
     public void render(SpriteBatch sb) {
@@ -232,29 +244,36 @@ public class CancelButton {
         if (Settings.isControllerMode) {
             //  FontHelper.renderFontLeft(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X - 30.0F * Settings.scale, DRAW_Y + TEXT_OFFSET_Y, tmpColor);
             FontHelper.renderFontLeft(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X - 30.0F * Settings.scale, DRAW_Y + TEXT_OFFSET_Y, tmpColor);
+            FontHelper.renderFontLeft(sb, FontHelper.buttonLabelFont, "重新开始战斗", this.current_x + TEXT_OFFSET_X, DRAW_Y1 + TEXT_OFFSET_Y, tmpColor);
         } else {
             FontHelper.renderFontCentered(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X, DRAW_Y + TEXT_OFFSET_Y, tmpColor);
+            FontHelper.renderFontCentered(sb, FontHelper.buttonLabelFont, "重新开始战斗", this.current_x + TEXT_OFFSET_X, DRAW_Y1 + TEXT_OFFSET_Y, tmpColor);
+
         }
 
         this.renderControllerUi(sb);
         if (!this.isHidden) {
             this.hb.render(sb);
         }
-        if (CardCrawlGame.isInARun() &&AbstractDungeon.screen == AbstractDungeon.CurrentScreen.SETTINGS && (AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoom || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomElite || AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoomBoss) && !(AbstractDungeon.getCurrRoom()).monsters.areMonstersBasicallyDead()) {
-            this.restartField.render(sb);
-        }
+
     }
 
     private void renderShadow(SpriteBatch sb) {
         sb.draw(ImageMaster.CANCEL_BUTTON_SHADOW, this.current_x - 256.0F, DRAW_Y - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON_SHADOW, this.current_x - 256.0F, DRAW_Y1 - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+
     }
 
     private void renderOutline(SpriteBatch sb) {
         sb.draw(ImageMaster.CANCEL_BUTTON_OUTLINE, this.current_x - 256.0F, DRAW_Y - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON_OUTLINE, this.current_x - 256.0F, DRAW_Y1 - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+
     }
 
     private void renderButton(SpriteBatch sb) {
         sb.draw(ImageMaster.CANCEL_BUTTON, this.current_x - 256.0F, DRAW_Y - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON, this.current_x - 256.0F, DRAW_Y1 - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+
     }
 
     private void renderControllerUi(SpriteBatch sb) {

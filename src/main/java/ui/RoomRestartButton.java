@@ -41,7 +41,7 @@ public class RoomRestartButton {
   
   private float target_x = this.current_x;
   
-  public boolean isHidden = true;
+  public boolean isHidden = false;
   
   private float glowAlpha = 0.0F;
   
