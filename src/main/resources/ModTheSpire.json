@@ -3,7 +3,7 @@
   "modName": "更多怪物组合",
   "modVersion": "1.0",
   "descriptions": {
-    "zhs": ["添加了更多怪物组合"],
+    "zhs": ["添加了更多怪物组合:一层弱怪：单柱/ 单爆炸机/ 两只小地精\n一层强怪：两个匕首/两只鸟/两只缓冲机\n一层精英：双咔咔/残血异蛇\n二层弱怪：双大鄂虫/, 小脑袋\n二层强怪：2 Jaw Worms (hard), 双小黑\n二层精英：4鸟/ 残血蛇女（无初始匕首）\n三层弱怪：双大史莱姆/ 清醒的乐加\n三层强怪：FungiBeast and Snake Plant, 超级幼儿园\n三层精英：双牧师+异蛇, Mysterious Sphere, 异蛇+邪咒\n终幕精英：Aggressive, Mega_GremlinNob"],
     "eng": [""]
   },
   "authorList": ["Dieyou"],

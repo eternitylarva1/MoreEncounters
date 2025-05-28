@@ -17,6 +17,7 @@ import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import moreEncounter.monsters.MegaGremlinNob;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MoreEncounter implements EditCardsSubscriber,
         PostInitializeSubscriber,
@@ -292,7 +293,7 @@ public class MoreEncounter implements EditCardsSubscriber,
     @Override
     public void receivePostInitialize() {
         BaseMod.encounterList=new ArrayList<>();
-
+       BaseMod. underScoreEncounterIDs=new HashMap<>();
         addExordiumEncounters();
         addCityEncounters();
         addBeyondEncounters();
